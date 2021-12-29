@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "require.js": "^1.0.0"
+  },
+  "name": "weather-dashboard",
+  "description": "api.openweathermap.org/data/2.5/weather?zip=46601&units=imperial",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jacob76134/Weather-Dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jacob76134/Weather-Dashboard/issues"
+  },
+  "homepage": "https://github.com/Jacob76134/Weather-Dashboard#readme"
+}
