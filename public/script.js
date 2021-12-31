@@ -12,16 +12,12 @@ var currentTemp = document.querySelector("#temperature")
 var forecastList = document.querySelector(".forecastList")
 var clearSearch = document.querySelector(".clearSearch")
 
-// const dotenv = require('dotenv').config()
-
+// require('dotenv').config()
 
 var dataCurrent;
 var dataForecast = [];
 
 var cityText = "";
-
-
-const apiKey = process.env.API_KEY;
 
 
 var urlCurrent = "";
@@ -59,8 +55,6 @@ function renderCities(){
             storeCities();
             renderCities();
             renderCurrentWeather();
-
-            console.log(event);
         })
     }
 }
@@ -75,34 +69,88 @@ function renderCurrentWeather(){
     var lat = 0;
     var lon = 0;
 
-    urlCurrent = "https://api.openweathermap.org/data/2.5/weather?q=" + cityText + "&Appid=" + apiKey + "&units=imperial";
-
-    fetch(urlCurrent)
+    fetch(`/api?q=${cityText}`)
     .then(function (response){
         return response.json();
     })
     .then(function (data) {
         // If we get status 200
-        if(data.cod === 200){
-            lat = data.coord.lat;
-            lon = data.coord.lon;
-            dataCurrent = data;
-
-            cityName.textContent = data.name;
-
-            // var cityIcon = document.createElement("img");
-            weatherImage.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
-            // cityName.append(cityIcon);
-            currentTemp.textContent = Math.floor(data.main.temp, 0) + "° F";
-            cityTemp.textContent = "Feels like " + data.main.feels_like + "° F";
-            cityWind.textContent = data.wind.speed + " mph Winds";
-            cityHumid.textContent = data.main.humidity + "% Humidity";
+        if(data.current.cod === 200){
+            lat = data.lat;
+            lon = data.lon;
 
 
-            // console.log(dataCurrent);
-            renderForecast(lat, lon);
+            // Current
+
+            dataCurrent = data.current;
+            cityName.textContent = dataCurrent.name;
+
+            weatherImage.src = `https://openweathermap.org/img/wn/${dataCurrent.weather[0].icon}@2x.png`
+            currentTemp.textContent = Math.floor(dataCurrent.main.temp) + "° F";
+            cityTemp.textContent = "Feels like " + dataCurrent.main.feels_like + "° F";
+            cityWind.textContent = dataCurrent.wind.speed + " mph Winds";
+            cityHumid.textContent = dataCurrent.main.humidity + "% Humidity";
+
+            // Forecast
+
+            // Clear the list
+            forecastList.innerHTML = "";
+
+            for (let i = 0; i < 5; i++) {
+                
+                let forecastData = data.forecast[i];
+
+                let date = new Date(forecastData.dt * 1000);
+                let dayOfTheWeek = "";
+
+                switch (date.getDay()) {
+                    case 0:
+                        dayOfTheWeek = 'Monday';
+                        break;
+                    case 1:
+                        dayOfTheWeek = 'Tuesday';
+                        break;
+                    case 2:
+                        dayOfTheWeek = 'Wednesday';
+                        break;
+                    case 3:
+                        dayOfTheWeek = 'Thursday';
+                        break;
+                    case 4:
+                        dayOfTheWeek = 'Friday';
+                        break;
+                    case 5:
+                        dayOfTheWeek = 'Saturday';
+                        break;
+                    case 6:
+                        dayOfTheWeek = 'Sunday';
+                        break;
+                        
+                        default:
+                            dayOfTheWeek = 'Unknown';
+                            break;
+                        }
+                        
+
+                let parsedTitle = "<div class='forecast-title'><h3>" + dayOfTheWeek + "</h3>" + (date.getMonth() + 1) + "/" + (date.getDate() + 1) + "/" + date.getFullYear() + "</div>";
+                
+                let el = document.createElement("div");
+
+                el.classList.add("forecastItem");
+                el.innerHTML = parsedTitle + 
+                `
+                <div class="forecast-weather">
+                <span class="forecast-temp">${forecastData.temp.day}° F</span>
+                <img src="https://openweathermap.org/img/wn/${forecastData.weather[0].icon}@2x.png"/>
+                </div>
+                <p>Wind: ${forecastData.wind_speed} mph</p>
+                <p>Humidity: ${forecastData.humidity}%</p>
+                `;
+
+                forecastList.appendChild(el);
+            }
+
         }else{
-            console.log("We got here");
             cities.filter(city => city !== cityText);
             renderCities();
         }
@@ -110,8 +158,6 @@ function renderCurrentWeather(){
 }
 
 function renderForecast(lat, lon){
-
-    urlForecast = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&Appid=" + apiKey + "&exclude=minutely,hourly&units=imperial";
 
     fetch(urlForecast).then(function (response){
         return response.json();
@@ -150,10 +196,10 @@ function renderForecast(lat, lon){
                     dayOfTheWeek = 'Sunday';
                     break;
                     
-                    default:
-                        dayOfTheWeek = 'Unknown';
-                        break;
-                    }
+                default:
+                    dayOfTheWeek = 'Unknown';
+                    break;
+                }
                     
 
             let parsedTitle = "<div class='forecast-title'><h3>" + dayOfTheWeek + "</h3>" + (date.getMonth() + 1) + "/" + (date.getDate() + 1) + "/" + date.getFullYear() + "</div>";
@@ -196,7 +242,6 @@ function renderForecast(lat, lon){
         cityUV.classList.add(uvClass); // Add the class that corresponds to the uvi
 
         dataForecast 
-        // console.log(dataForecast);
     })
 }
 
