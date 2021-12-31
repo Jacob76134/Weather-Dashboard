@@ -150,100 +150,34 @@ function renderCurrentWeather(){
                 forecastList.appendChild(el);
             }
 
-        }else{
-            cities.filter(city => city !== cityText);
-            renderCities();
-        }
+            let uvi = data.forecast[0].uvi;
+            // Set the UV Index
+            cityUV.innerHTML = "UV Index: <span>" + uvi + "</span>";
+
+            let uvClass = "";
+
+            if(0 <= uvi && uvi < 3){
+                uvClass = 'low';
+            }else if(3 <= uvi && uvi < 6){
+                uvClass = 'moderate';
+            }else if(6 <= uvi && uvi < 8){
+                uvClass = 'high';
+            }else if(8 <= uvi && uvi < 11){
+                uvClass = 'very-high';
+            }else{
+                uvClass = 'extreme';
+            }
+
+            cityUV.className = ""; // Clear the classes on the element
+            cityUV.classList.add(uvClass); // Add the class that corresponds to the uvi
+
+            }else{
+                cities.filter(city => city !== cityText);
+                renderCities();
+            }
     })
 }
 
-function renderForecast(lat, lon){
-
-    fetch(urlForecast).then(function (response){
-        return response.json();
-    }).then(function (data) {
-
-        // Clear the list
-        forecastList.innerHTML = "";
-
-        for (let i = 0; i < 5; i++) {
-            
-            let forecastData = data.daily[i];
-
-            let date = new Date(forecastData.dt * 1000);
-            let dayOfTheWeek = "";
-
-            switch (date.getDay()) {
-                case 0:
-                    dayOfTheWeek = 'Monday';
-                    break;
-                case 1:
-                    dayOfTheWeek = 'Tuesday';
-                    break;
-                case 2:
-                    dayOfTheWeek = 'Wednesday';
-                    break;
-                case 3:
-                    dayOfTheWeek = 'Thursday';
-                    break;
-                case 4:
-                    dayOfTheWeek = 'Friday';
-                    break;
-                case 5:
-                    dayOfTheWeek = 'Saturday';
-                    break;
-                case 6:
-                    dayOfTheWeek = 'Sunday';
-                    break;
-                    
-                default:
-                    dayOfTheWeek = 'Unknown';
-                    break;
-                }
-                    
-
-            let parsedTitle = "<div class='forecast-title'><h3>" + dayOfTheWeek + "</h3>" + (date.getMonth() + 1) + "/" + (date.getDate() + 1) + "/" + date.getFullYear() + "</div>";
-            
-            let el = document.createElement("div");
-
-            el.classList.add("forecastItem");
-            el.innerHTML = parsedTitle + 
-            `
-            <div class="forecast-weather">
-            <span class="forecast-temp">${forecastData.temp.day}° F</span>
-            <img src="https://openweathermap.org/img/wn/${forecastData.weather[0].icon}@2x.png"/>
-            </div>
-            <p>Wind: ${forecastData.wind_speed} mph</p>
-            <p>Humidity: ${forecastData.humidity}%</p>
-            `;
-
-            forecastList.appendChild(el);
-        } // End For
-
-        let uvi = data.current.uvi;
-        // Set the UV Index
-        cityUV.innerHTML = "UV Index: <span>" + uvi + "</span>";
-
-        let uvClass = "";
-
-        if(0 <= uvi && uvi < 3){
-            uvClass = 'low';
-        }else if(3 <= uvi && uvi < 6){
-            uvClass = 'moderate';
-        }else if(6 <= uvi && uvi < 8){
-            uvClass = 'high';
-        }else if(8 <= uvi && uvi < 11){
-            uvClass = 'very-high';
-        }else{
-            uvClass = 'extreme';
-        }
-
-        cityUV.className = ""; // Clear the classes on the element
-        cityUV.classList.add(uvClass); // Add the class that corresponds to the uvi
-
-        dataForecast 
-    })
-}
 
 citySubmit.addEventListener("click", (event) => {
         event.preventDefault();

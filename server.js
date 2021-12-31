@@ -30,6 +30,7 @@ app.get('/api', (req, res) => {
     let query = req.query.q;
 
     urlCurrent = "https://api.openweathermap.org/data/2.5/weather?q=" + query + "&Appid=" + apiKey + "&units=imperial";
+    urlForecast = "https://api.openweathermap.org/data/2.5/onecall?lat=" + resData.lat + "&lon=" + resData.lon + "&Appid=" + apiKey + "&exclude=minutely,hourly&units=imperial";
 
     axios.get(urlCurrent).then(response => {
 
@@ -40,21 +41,22 @@ app.get('/api', (req, res) => {
                 resData.lon = response.data.coord.lon;
                 resData.current = response.data;
 
-                urlForecast = "https://api.openweathermap.org/data/2.5/onecall?lat=" + resData.lat + "&lon=" + resData.lon + "&Appid=" + apiKey + "&exclude=minutely,hourly&units=imperial";
-
-                axios.get(urlForecast).then(data => {
                 
-                    for (let i = 0; i < 5; i++) {
-                        resData.forecast.push(data.data.daily[i]);
-                    }
 
-                    res.send(resData);
-
-                })
             }else{
                 res.sendStatus(response.data.cod);
             }
-        })
+        }).then(axios.get(urlForecast).then(data => {
+                
+            resData.forecast = [];
+
+            for (let i = 0; i < 5; i++) {
+                resData.forecast.push(data.data.daily[i]);
+            }
+
+            res.send(resData);
+
+        }))
 });
 
 
